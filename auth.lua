@@ -261,7 +261,7 @@ if isAuthenticated then
     end
     
     -- Aqui você pode carregar seu script principal
-    -- loadstring(game:HttpGet("https://raw.githubusercontent.com/seu-usuario/seu-script/main/script.lua"))()
+    
     
     print("🚀 Script executado com sucesso!")
     
@@ -282,8 +282,8 @@ else
     print("⚠️ Executando versão limitada...")
     
     -- Script gratuito/limitado
-    print("💡 Funcionalidades limitadas ativas")
-    -- Aqui você pode colocar uma versão limitada do seu script
+    print("Use o loader free ou delete sua key e gere outra. Se mesmo assim não funcionar, reporte ao @sirgato._ no servidor do discord.")
+    
 end
 
 -- ===============================

@@ -49,5 +49,5 @@ if valid then
 else
     print("Executando script alternativo por causa de erro:", err)
     -- Coloque aqui sua loadstring alternativa:
-    print("foi")
+    print("não foi")
 end

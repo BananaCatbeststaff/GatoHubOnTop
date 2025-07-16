@@ -21,7 +21,7 @@ local KEY = getgenv().KEY
 
 -- Configurações JSONBin.io
 local JSONBIN_BIN_ID = "68772ef5a1c90418afa7d776" -- Substitua pelo seu Bin ID
-local JSONBIN_API_KEY = "$2a$10$c3fijGM2Qq0w7OR58Y/RMur8Jtr9MtM/zyEcdJ/HBWVzsD2BqA1mm" -- Substitua pela sua API Key
+local JSONBIN_API_KEY = "$2a$10$ulddJl8wFt.NgIUkMOy0resMZNG3YvqGAGMGSowqbAgqkbDoCZ8zu" -- Substitua pela sua API Key
 local JSONBIN_URL = "https://api.jsonbin.io/v3/b/" .. JSONBIN_BIN_ID
 
 -- ===============================

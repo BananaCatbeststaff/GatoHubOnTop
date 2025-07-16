@@ -1,8 +1,8 @@
 --[[
-    SISTEMA DE AUTENTICAÇÃO COM SYN.REQUEST
+    SISTEMA DE AUTENTICAÇÃO - COMPATIBILIDADE UNIVERSAL
     
-    Usa syn.request para requisições HTTP GET
-    Compatível com executores que suportam syn.request
+    Detecta automaticamente o melhor método HTTP disponível
+    Fallback automático se syn.request for bloqueado
 ]]
 
 -- ===============================
@@ -13,17 +13,18 @@ getgenv().KEY = getgenv().KEY or ""
 -- Validações iniciais
 assert(getgenv().KEY ~= "", "Chave não definida! Defina getgenv().KEY antes de executar.")
 assert(gethwid, "Função gethwid() não encontrada no executor")
-assert(syn and syn.request, "syn.request não encontrado! Este executor não suporta syn.request")
 
 local KEY = getgenv().KEY
 local HWID = gethwid()
+local HttpService = game:GetService("HttpService")
 
-local function verifyKey()
-    local url = ("https://server-dun-six.vercel.app/api/HWIDCheck?key=%s&hwid=%s"):format(KEY, HWID)
-    
-    print("🔐 Verificando autenticação com syn.request...")
-    print("Key:", KEY)
-    print("HWID:", HWID)
+-- ===============================
+-- FUNÇÃO COM syn.request
+-- ===============================
+local function requestWithSyn(url)
+    if not (syn and syn.request) then
+        return false, "syn.request não disponível"
+    end
     
     local success, response = pcall(function()
         return syn.request({
@@ -36,19 +37,79 @@ local function verifyKey()
     end)
     
     if not success then
-        warn("❌ Erro na requisição HTTP:", response)
-        return false, "Erro de conexão"
+        return false, "syn.request bloqueado: " .. tostring(response)
     end
     
-    -- Verificar se a requisição foi bem-sucedida
     if response.StatusCode ~= 200 then
-        warn("❌ Erro HTTP:", response.StatusCode, response.StatusMessage)
-        return false, "Erro HTTP: " .. response.StatusCode
+        return false, "HTTP erro: " .. response.StatusCode
+    end
+    
+    return true, response.Body
+end
+
+-- ===============================
+-- FUNÇÃO COM HttpService
+-- ===============================
+local function requestWithHttpService(url)
+    local success, response = pcall(function()
+        return HttpService:GetAsync(url)
+    end)
+    
+    if not success then
+        return false, "HttpService erro: " .. tostring(response)
+    end
+    
+    return true, response
+end
+
+-- ===============================
+-- FUNÇÃO UNIVERSAL (DETECTA AUTOMATICAMENTE)
+-- ===============================
+local function makeRequest(url)
+    print("🔄 Detectando método HTTP disponível...")
+    
+    -- Tentar syn.request primeiro (se disponível)
+    local synSuccess, synResponse = requestWithSyn(url)
+    if synSuccess then
+        print("✅ Usando syn.request")
+        return true, synResponse
+    else
+        print("⚠️ syn.request falhou:", synResponse)
+    end
+    
+    -- Fallback para HttpService
+    print("🔄 Tentando HttpService como fallback...")
+    local httpSuccess, httpResponse = requestWithHttpService(url)
+    if httpSuccess then
+        print("✅ Usando HttpService")
+        return true, httpResponse
+    else
+        print("❌ HttpService falhou:", httpResponse)
+    end
+    
+    return false, "Nenhum método HTTP funcionou"
+end
+
+-- ===============================
+-- FUNÇÃO PRINCIPAL DE VERIFICAÇÃO
+-- ===============================
+local function verifyKey()
+    local url = ("https://server-dun-six.vercel.app/api/HWIDCheck?key=%s&hwid=%s"):format(KEY, HWID)
+    
+    print("🔐 Verificando autenticação...")
+    print("Key:", KEY)
+    print("HWID:", HWID)
+    
+    local success, responseBody = makeRequest(url)
+    
+    if not success then
+        warn("❌ Erro na requisição:", responseBody)
+        return false, "Erro de conexão"
     end
     
     local data = nil
     local ok, err = pcall(function()
-        data = game:GetService("HttpService"):JSONDecode(response.Body)
+        data = HttpService:JSONDecode(responseBody)
     end)
     
     if not ok then
@@ -82,10 +143,9 @@ if valid then
     -- SEU SCRIPT PRINCIPAL AQUI
     -- ===============================
     
-    -- Exemplo de uso
     print("✨ Script premium executado com sucesso!")
     
-    -- Aqui você pode colocar:
+    -- Exemplo de loadstring:
     -- loadstring(game:HttpGet("https://raw.githubusercontent.com/seu-repo/script.lua"))()
     
 else

@@ -1,16 +1,13 @@
-
 local HttpService = game:GetService("HttpService")
 
--- A key deve ser definida antes de rodar o script
 local KEY = getgenv().KEY or ""
 assert(KEY ~= "", "Chave não definida! Defina getgenv().KEY antes de executar.")
 
--- Função para obter HWID (supondo que o executor forneça essa função)
 assert(gethwid, "Função gethwid() não encontrada no executor")
 local HWID = gethwid()
 
 local function verifyKey()
-    local url = ("https://server-dun-six.vercel.app/api/HWIDCheck?key=%s&hwid=%s%22):format(KEY, HWID)
+    local url = ("https://server-dun-six.vercel.app/api/HWIDCheck?key=%s&hwid=%s"):format(KEY, HWID)
     local success, response = pcall(function()
         return HttpService:GetAsync(url)
     end)
@@ -52,5 +49,5 @@ if valid then
 else
     print("Executando script alternativo por causa de erro:", err)
     -- Coloque aqui sua loadstring alternativa:
-   print("foi")
-end 
+    print("foi")
+end

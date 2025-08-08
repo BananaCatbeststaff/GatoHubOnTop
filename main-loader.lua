@@ -3,6 +3,8 @@ local obfuscatedIDs = {
     [96342491571673] = true
 }
 
+local placeId = game.PlaceId
+
 if placeId == 79546208627805 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/BananaCatbeststaff/GatoHubOnTop/refs/heads/main/99-nights.lua"))()
 elseif obfuscatedIDs[placeId] then
